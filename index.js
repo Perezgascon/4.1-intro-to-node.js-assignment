@@ -1,34 +1,42 @@
 const http = require('http');
 const url = require('url');
 
-http.createServer((req, res) => {
+const server = http.createServer((req, res) => {
 
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET');
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
 
-    if (req.url === '/profile') {
-        res.write(`This is the ${req.url} page!`);
-    }
-    else if (req.url === '/products') {
-        res.write(`This is the ${req.url} page!`);
-    }
-    else if (req.url === '/cart') {
-        res.write(`This is the ${req.url} page!`);
-    }
-    else if (req.url === '/register') {
-        res.write(`This is the ${req.url} page!`);
+    const parsedUrl = url.parse(req.url, true);
+    const pathname = parsedUrl.pathname;
+    const query = parsedUrl.query;
+
+    if (pathname === '/profile' || pathname === '/products' || pathname === '/cart' || pathname === '/register' || pathname === '/login') {
+        res.write(`This is the ${pathname} page!`);
+    } else if (pathname === '/') {
+        res.write("Welcome to my site");
+    } else {
+        res.write(pathname);
     }
 
-    else if (req.url === '/login') {
-        res.write(`This is the ${req.url} page!`);
-    }
-    else if (req.url === '/') {
-        res.write("Welcome to my site");
-    }
-    else {
-        res.write(req.url);
+    if (query && query.search) {
+        const searchKeywords = ['Milk', 'Eggs', 'Cheese', 'Pork', 'Shrimp', 'Chicken'];
+        const searchTerm = query.search.toLowerCase(); // Convert to lowercase for case-insensitive comparison
+    
+        const foundKeyword = searchKeywords.find(keyword => keyword.toLowerCase() === searchTerm);
+    
+        if (foundKeyword) {
+            res.write(`Product "${foundKeyword}" found.`);
+        } else {
+            res.write(`Product "${searchTerm}" not found.`);
+        }
+    } else {
+        res.write('Search parameter is missing.');
     }
 
     res.end();
-}).listen(8080);
+});
+
+server.listen(8080, () => {
+    console.log('Server is running on http://localhost:8080');
+});
